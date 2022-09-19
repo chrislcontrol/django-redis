@@ -1,29 +1,38 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django_redis.settings import redis_instance
+from django_redis.register.orm import RegisterRepository, RedisHandler
 
 
 class RegisterView(APIView):
     def post(self, request):
         key = request.data.get("key")
         value = request.data.get("value")
-
-        redis_instance.set(key, value, ex=15)
+        with RedisHandler().session() as redis:
+            redis.set(key, value, ex=15)
 
         return Response(status=204)
 
     def get(self, request):
-        keys = redis_instance.keys()
-        return Response({key.decode('utf-8'): redis_instance.get(key) for key in keys})
+        repo = RegisterRepository()
+        registers = repo.list_all()
+
+        return Response(data=registers, status=200)
 
 
 class HashRegisterView(APIView):
     def post(self, request):
-        key = request.data.get("key")
-        value = request.data.get("value")
+        repo = RegisterRepository()
 
-        redis_instance.hset(key, value)
-        redis_instance.expire(key, 15)
+        register = repo.create_register(request.data)
 
-        return Response(status=204)
+        return Response(data=register, status=201)
+
+
+class HashRegisterDetailView(APIView):
+    def get(self, request, id):
+        repo = RegisterRepository()
+
+        register = repo.get_by_collection_and_id(id)
+
+        return Response(data=register, status=200)

@@ -121,11 +121,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
-
-# Connect to our Redis instance
-redis_instance = redis.StrictRedis(host=REDIS_HOST,
-                                   port=REDIS_PORT,
-                                   db=0)
+REGISTER_COLLECTION = "d67abb5d-e9bc-4d85-b493-2ab8634bf83d"
